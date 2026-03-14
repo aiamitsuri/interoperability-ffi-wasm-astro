@@ -12,7 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@aiamitsuri/interoperability-ffi-wasm": "^0.1.11",
+    "@aiamitsuri/interoperability-ffi-wasm": "^0.1.14",
     "@astrojs/svelte": "^8.0.0",
     "astro": "^6.0.2",
     "svelte": "^5.53.10",

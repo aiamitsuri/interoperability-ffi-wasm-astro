@@ -9,44 +9,61 @@
   async function loadData() {
     loading = true;
     error = null;
+    
     try {
+      // Initialize Wasm (Required for Web)
       await wasm.default();
-      const data = await wasm.fetch_from_js({ 
-        language: "node", 
-        integration: "done" 
-      });
+
+      const params = {
+        // language: "node",
+        // integration: "done",
+        // crates: "wasm",
+        // developmentkit: "app",
+        // page: "1",
+        // ids: null,
+		// ids: [1].join(","),
+		ids: [1, 3, 4].join(","),
+      };
+
+      const data = await wasm.fetch_from_js(params);
+      console.log("Data received from Rust:", data);
       results = data;
     } catch (err) {
+      console.error("Wasm Error:", err);
       error = err.toString();
     } finally {
       loading = false;
     }
   }
 
-  onMount(loadData);
+  onMount(() => {
+    loadData();
+  });
 </script>
 
-<div class="wasm-card">
-  <h2>Astro/Svelte + Rust Wasm</h2>
-  
-  <button onclick={loadData} disabled={loading}>
-    {loading ? 'Fetching...' : '🔄 Refresh Rust Logic'}
+<main style="padding: 20px; font-family: sans-serif;">
+  <h1>🚩 Interoperability Search (Astro/Svelte + Rust)</h1>
+
+  <button 
+    onclick={loadData} 
+    disabled={loading}
+    style="margin-bottom: 20px; padding: 8px 16px; cursor: pointer;"
+  >
+    {loading ? 'Refreshing...' : '🔄 Refresh Data'}
   </button>
 
   {#if loading && !results}
-    <p>Loading Wasm module...</p>
+    <p>🚀 Initializing Rust Wasm...</p>
   {:else if error}
-    <p class="error">Error: {error}</p>
+    <p style="color: red;">❌ Error: {error}</p>
   {:else if results}
-    <div class="results">
-      <p>Found <strong>{results.pagination.total_items}</strong> items.</p>
-      <pre>{JSON.stringify(results, null, 2)}</pre>
+    <div>
+      <h3>Found {results.pagination?.total_items || 0} Items</h3>
+      <pre style="background: #f4f4f4; padding: 10px; border-radius: 8px; overflow: auto;">
+        {JSON.stringify(results, null, 2)}
+      </pre>
     </div>
+  {:else}
+    <p>No results found.</p>
   {/if}
-</div>
-
-<style>
-  .wasm-card { border: 1px solid #ccc; padding: 1rem; border-radius: 8px; }
-  pre { background: #f4f4f4; padding: 0.5rem; overflow: auto; max-height: 400px; }
-  .error { color: red; }
-</style>
+</main>
